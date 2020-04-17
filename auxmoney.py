@@ -1,3 +1,4 @@
+import datetime
 import sys
 import time
 
@@ -106,32 +107,51 @@ class Auxmoney:
             sys.stdout.flush()
 
         for i in range(len(back_payment_table_rows)):
-            transaction_date = back_payment_plan_table_rows[i].find_elements_by_tag_name("td")[1].text
+            transaction_date_text = back_payment_plan_table_rows[i].find_elements_by_tag_name("td")[1].text
 
-            loan_transaction = dict()
-            loan_transaction['id'] = loan_id
-            loan_transaction['date'] = transaction_date
-            loan_transaction['value'] = float(back_payment_table_rows[i].find_elements_by_tag_name("td")[1].text
-                                                                        .replace('€', '').replace(',', '.').strip())
-            loan_transaction['type'] = 'Zinsen'
-            if loan_transaction['value'] > 0:
-                loan_transactions.append(loan_transaction)
-                if self.args and self.args.verbose and self.args.verbose >= 2:
-                    sys.stdout.write('      {id}: [{date}] {value} interest\r\n'
-                                     .format(id=loan_transaction['id'], date=loan_transaction['date'], value=loan_transaction['value']))
-                    sys.stdout.flush()
+            if self.args and self.args.earliest:
+                transaction_date = datetime.datetime.strptime(transaction_date_text, '%d.%m.%Y')
+                filter_earliest = datetime.datetime.fromisoformat(self.args.earliest)
+                if transaction_date < filter_earliest:
+                    # ignore items that are earlier than the specified date
+                    continue
 
-            loan_fee = dict()
-            loan_fee['id'] = loan_id
-            loan_fee['date'] = transaction_date
-            loan_fee['value'] = float(back_payment_table_rows[i].find_elements_by_tag_name("td")[2].text
-                                                                .replace('€', '').replace(',', '.').strip())
-            loan_fee['type'] = 'Gebühren'
-            if loan_fee['value'] > 0:
-                loan_transactions.append(loan_fee)
-                if self.args and self.args.verbose and self.args.verbose >= 2:
-                    sys.stdout.write('      {id}: [{date}] {value} fee\r\n'
-                                     .format(id=loan_fee['id'], date=loan_fee['date'], value=loan_fee['value']))
-                    sys.stdout.flush()
+            transaction_interest = self.__parse_transaction_interest(back_payment_table_rows[i], loan_id, transaction_date_text)
+            if transaction_interest:
+                loan_transactions.append(transaction_interest)
+            transaction_fee = self.__parse_transaction_fee(back_payment_table_rows[i], loan_id, transaction_date_text)
+            if transaction_fee:
+                loan_transactions.append(transaction_fee)
 
         return loan_transactions
+
+    def __parse_transaction_interest(self, back_payment_table_row, loan_id, transaction_date_text):
+        transaction_interest = dict()
+        transaction_interest['id'] = loan_id
+        transaction_interest['date'] = transaction_date_text
+        transaction_interest['value'] = float(back_payment_table_row.find_elements_by_tag_name("td")[1].text
+                                          .replace('€', '').replace(',', '.').strip())
+        transaction_interest['type'] = 'Zinsen'
+        if transaction_interest['value'] > 0:
+            if self.args and self.args.verbose and self.args.verbose >= 2:
+                sys.stdout.write('      {id}: [{date}] {value} interest\r\n'
+                                 .format(id=transaction_interest['id'], date=transaction_interest['date'],
+                                         value=transaction_interest['value']))
+                sys.stdout.flush()
+            return transaction_interest
+        return None
+
+    def __parse_transaction_fee(self, back_payment_table_row, loan_id, transaction_date_text):
+        transaction_fee = dict()
+        transaction_fee['id'] = loan_id
+        transaction_fee['date'] = transaction_date_text
+        transaction_fee['value'] = float(back_payment_table_row.find_elements_by_tag_name("td")[2].text
+                                  .replace('€', '').replace(',', '.').strip())
+        transaction_fee['type'] = 'Gebühren'
+        if transaction_fee['value'] > 0:
+            if self.args and self.args.verbose and self.args.verbose >= 2:
+                sys.stdout.write('      {id}: [{date}] {value} fee\r\n'
+                                 .format(id=transaction_fee['id'], date=transaction_fee['date'], value=transaction_fee['value']))
+                sys.stdout.flush()
+            return transaction_fee
+        return None
