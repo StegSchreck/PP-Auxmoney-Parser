@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/StegSchreck/PP-Auxmoney-Parser/master/PP-Auxmoney-Parser.png" width="250px">
+  <img src="https://raw.githubusercontent.com/StegSchreck/PP-Auxmoney-Parser/master/PP-Auxmoney-Parser.png" width="500px">
 </p>
 
 # PP-Auxmoney-Parser
