@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import sys
 
 import file_impex
 from auxmoney import Auxmoney
@@ -9,8 +10,26 @@ def main():
     args = parse_args()
     auxmoney = Auxmoney(args)
     loan_transactions = auxmoney.parse_loans()
+    print_summary(loan_transactions)
     file_impex.save_loan_transactions_to_csv(loan_transactions)
     auxmoney.browser_handler.kill()
+
+
+def print_summary(loan_transactions):
+    interests = [transaction['value'] for transaction in loan_transactions if transaction['type'] == 'Zinsen']
+    fees = [transaction['value'] for transaction in loan_transactions if transaction['type'] == 'Gebühren']
+
+    avg_interest = sum(interests) / float(len(interests))
+    avg_fee = sum(fees) / float(len(fees))
+
+    sys.stdout.write('===== SUMMARY =====\r\n')
+    sys.stdout.write('{count} transactions of interests: SUM={sum} AVG={avg} MIN={min} MAX={max}\r\n'
+                     .format(count=len(interests), sum=sum(interests), avg=avg_interest, min=min(interests), max=max(interests)))
+    sys.stdout.write('{count} transactions of fees: SUM={sum} AVG={avg} MIN={min} MAX={max}\r\n'
+                     .format(count=len(fees), sum=sum(fees), avg=avg_fee, min=min(fees), max=max(fees)))
+    sys.stdout.write('===================\r\n\r\n')
+    sys.stdout.flush()
+
 
 
 def parse_args():
