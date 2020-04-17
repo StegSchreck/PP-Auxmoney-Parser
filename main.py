@@ -21,6 +21,7 @@ def parse_args():
     argparser.add_argument("-u", "--username", help="username for Auxmoney login", required=True)
     argparser.add_argument("-p", "--password", help="password for Auxmoney login", required=True)
     argparser.add_argument("--earliest", help="earliest date of transactions to be considered", required=False)
+    argparser.add_argument("--latest", help="latest date of transactions to be considered", required=False)
     args = argparser.parse_args()
     return args
 

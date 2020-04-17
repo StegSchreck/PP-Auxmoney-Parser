@@ -108,12 +108,18 @@ class Auxmoney:
 
         for i in range(len(back_payment_table_rows)):
             transaction_date_text = back_payment_plan_table_rows[i].find_elements_by_tag_name("td")[1].text
+            transaction_date = datetime.datetime.strptime(transaction_date_text, '%d.%m.%Y')
 
             if self.args and self.args.earliest:
-                transaction_date = datetime.datetime.strptime(transaction_date_text, '%d.%m.%Y')
                 filter_earliest = datetime.datetime.fromisoformat(self.args.earliest)
                 if transaction_date < filter_earliest:
                     # ignore items that are earlier than the specified date
+                    continue
+
+            if self.args and self.args.latest:
+                filter_latest = datetime.datetime.fromisoformat(self.args.latest)
+                if filter_latest < transaction_date:
+                    # ignore items that are later than the specified date
                     continue
 
             transaction_interest = self.__parse_transaction_interest(back_payment_table_rows[i], loan_id, transaction_date_text)

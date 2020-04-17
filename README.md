@@ -40,6 +40,8 @@ You can start the import to Portfolio Performance using this file then.
 ### Optional
 `--earliest`: earliest date of transactions to be considered in the ISO format (e.g. `2019-12-31` for 31st december 2019)
 
+`--latest`: latest date of transactions to be considered in the ISO format (e.g. `2019-12-31` for 31st december 2019)
+
 `-v` / `--verbose`: increase output verbosity
 
 `-x` / `--show_browser`: show the browser doing his work (this might help for debugging)
