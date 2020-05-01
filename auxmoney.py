@@ -132,41 +132,32 @@ class Auxmoney:
         return loan_transactions
 
     def __parse_transaction_interest(self, back_payment_table_row, loan_id, transaction_date_text):
-        transaction_interest = dict()
-        transaction_interest['id'] = loan_id
-        transaction_interest['date'] = transaction_date_text
-        cell_content = back_payment_table_row.find_elements_by_tag_name("td")[1].text\
-            .replace('€', '').replace(',', '.').strip()
-        if cell_content == '-':
-            return None
-
-        transaction_interest['value'] = float(cell_content)
-        transaction_interest['type'] = 'Zinsen'
-        if transaction_interest['value'] > 0:
-            if self.args and self.args.verbose and self.args.verbose >= 2:
-                sys.stdout.write('      {id}: [{date}] {value} interest\r\n'
-                                 .format(id=transaction_interest['id'], date=transaction_interest['date'],
-                                         value=transaction_interest['value']))
-                sys.stdout.flush()
-            return transaction_interest
-        return None
+        transaction_cell = back_payment_table_row.find_elements_by_tag_name("td")[1]
+        transaction_type = 'Zinsen'
+        return self.__parse_transaction(loan_id, transaction_cell, transaction_date_text, transaction_type)
 
     def __parse_transaction_fee(self, back_payment_table_row, loan_id, transaction_date_text):
-        transaction_fee = dict()
-        transaction_fee['id'] = loan_id
-        transaction_fee['date'] = transaction_date_text
-        cell_content = back_payment_table_row.find_elements_by_tag_name("td")[2].text\
-            .replace('€', '').replace(',', '.').strip()
+        transaction_cell = back_payment_table_row.find_elements_by_tag_name("td")[2]
+        transaction_type = 'Gebühren'
+        return self.__parse_transaction(loan_id, transaction_cell, transaction_date_text, transaction_type)
+
+    def __parse_transaction(self, loan_id, transaction_cell, transaction_date_text, transaction_type):
+        transaction = dict()
+        transaction['id'] = loan_id
+        transaction['date'] = transaction_date_text
+        cell_content = transaction_cell.text.replace('€', '').replace(',', '.').strip()
         if cell_content == '-':
             return None
-
-        transaction_fee['value'] = float(cell_content)
-        transaction_fee['type'] = 'Gebühren'
-        if transaction_fee['value'] > 0:
+        transaction['value'] = float(cell_content)
+        transaction['type'] = transaction_type
+        if transaction['value'] > 0:
             if self.args and self.args.verbose and self.args.verbose >= 2:
-                sys.stdout.write('      {id}: [{date}] {value} fee\r\n'
-                                 .format(id=transaction_fee['id'], date=transaction_fee['date'],
-                                         value=transaction_fee['value']))
+                sys.stdout.write('      {id}: [{date}] {value} {type}\r\n'.format(
+                    id=transaction['id'],
+                    date=transaction['date'],
+                    value=transaction['value'],
+                    type=transaction['type']
+                ))
                 sys.stdout.flush()
-            return transaction_fee
+            return transaction
         return None
