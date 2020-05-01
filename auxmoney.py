@@ -135,8 +135,12 @@ class Auxmoney:
         transaction_interest = dict()
         transaction_interest['id'] = loan_id
         transaction_interest['date'] = transaction_date_text
-        transaction_interest['value'] = float(back_payment_table_row.find_elements_by_tag_name("td")[1].text
-                                          .replace('€', '').replace(',', '.').strip())
+        cell_content = back_payment_table_row.find_elements_by_tag_name("td")[1].text\
+            .replace('€', '').replace(',', '.').strip()
+        if cell_content == '-':
+            return None
+
+        transaction_interest['value'] = float(cell_content)
         transaction_interest['type'] = 'Zinsen'
         if transaction_interest['value'] > 0:
             if self.args and self.args.verbose and self.args.verbose >= 2:
@@ -151,13 +155,18 @@ class Auxmoney:
         transaction_fee = dict()
         transaction_fee['id'] = loan_id
         transaction_fee['date'] = transaction_date_text
-        transaction_fee['value'] = float(back_payment_table_row.find_elements_by_tag_name("td")[2].text
-                                  .replace('€', '').replace(',', '.').strip())
+        cell_content = back_payment_table_row.find_elements_by_tag_name("td")[2].text\
+            .replace('€', '').replace(',', '.').strip()
+        if cell_content == '-':
+            return None
+
+        transaction_fee['value'] = float(cell_content)
         transaction_fee['type'] = 'Gebühren'
         if transaction_fee['value'] > 0:
             if self.args and self.args.verbose and self.args.verbose >= 2:
                 sys.stdout.write('      {id}: [{date}] {value} fee\r\n'
-                                 .format(id=transaction_fee['id'], date=transaction_fee['date'], value=transaction_fee['value']))
+                                 .format(id=transaction_fee['id'], date=transaction_fee['date'],
+                                         value=transaction_fee['value']))
                 sys.stdout.flush()
             return transaction_fee
         return None
