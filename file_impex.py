@@ -4,11 +4,10 @@ import sys
 import time
 
 TIMESTAMP = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d%H%M%S')
-EXPORTS_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), 'exports'))
 CSV_HEADER = 'Datum,Wert,Buchungswährung,Typ,Notiz\n'
 
 
-def save_loan_transactions_to_csv(loan_transactions, folder=EXPORTS_FOLDER, filename=TIMESTAMP + '_auxmoney.csv'):
+def save_loan_transactions_to_csv(loan_transactions, folder, filename=TIMESTAMP + '_auxmoney.csv'):
     sys.stdout.write('===== saving loan transactions to CSV\r\n')
     sys.stdout.write('      folder: {}\r\n'.format(folder))
     sys.stdout.write('      filename: {}\r\n'.format(filename))

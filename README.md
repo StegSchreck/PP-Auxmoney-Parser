@@ -42,6 +42,8 @@ You can start the import to Portfolio Performance using this file then.
 
 `--latest`: latest date of transactions to be considered in the ISO format (e.g. `2019-12-31` for 31st december 2019)
 
+`-d` / `--destination`: destination folder for the resulting CSV file containing the parsed data
+
 `-v` / `--verbose`: increase output verbosity
 
 `-x` / `--show_browser`: show the browser doing his work (this might help for debugging)

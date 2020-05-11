@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 import argparse
+import os
 import sys
 
 import file_impex
 from auxmoney import Auxmoney
+
+EXPORTS_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), 'exports'))
 
 
 def main():
@@ -11,7 +14,7 @@ def main():
     auxmoney = Auxmoney(args)
     loan_transactions = auxmoney.parse_loans()
     print_summary(loan_transactions)
-    file_impex.save_loan_transactions_to_csv(loan_transactions)
+    file_impex.save_loan_transactions_to_csv(loan_transactions, folder=args.destination)
     auxmoney.browser_handler.kill()
 
 
@@ -31,7 +34,6 @@ def print_summary(loan_transactions):
     sys.stdout.flush()
 
 
-
 def parse_args():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-v", "--verbose", action="count", help="increase output verbosity", required=False)
@@ -41,6 +43,8 @@ def parse_args():
     argparser.add_argument("-p", "--password", help="password for Auxmoney login", required=True)
     argparser.add_argument("--earliest", help="earliest date of transactions to be considered", required=False)
     argparser.add_argument("--latest", help="latest date of transactions to be considered", required=False)
+    argparser.add_argument("-d", "--destination", help="destination folder for result CSV file", required=False,
+                           default=EXPORTS_FOLDER)
     args = argparser.parse_args()
     return args
 

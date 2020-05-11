@@ -1,5 +1,4 @@
 import datetime
-import os
 import time
 
 from selenium.common.exceptions import WebDriverException
@@ -8,7 +7,6 @@ from selenium.webdriver.firefox.options import Options
 from xvfbwrapper import Xvfb
 
 TIMESTAMP = datetime.datetime.fromtimestamp(time.time()).strftime('%Y%m%d%H%M%S')
-EXPORTS_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
 
 class BrowserHandler:
@@ -21,7 +19,7 @@ class BrowserHandler:
         log_level = self._define_log_level(self.args)
         capabilities = self._create_browser_capabilities(log_level)
         options = self._create_browser_options(log_level)
-        profile = self._create_browser_profile()
+        profile = self._create_browser_profile(self.args.destination)
 
         self.browser = Firefox(
             firefox_profile=profile,
@@ -62,11 +60,11 @@ class BrowserHandler:
         return options
 
     @staticmethod
-    def _create_browser_profile():
+    def _create_browser_profile(exports_folder):
         profile = FirefoxProfile()
         profile.set_preference("browser.download.folderList", 2)
         profile.set_preference("browser.download.manager.showWhenStarting", False)
-        profile.set_preference("browser.download.dir", EXPORTS_FOLDER)
+        profile.set_preference("browser.download.dir", exports_folder)
         profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv, application/zip")
         profile.set_preference("browser.helperApps.alwaysAsk.force", False)
         profile.set_preference("devtools.jsonview.enabled", False)
