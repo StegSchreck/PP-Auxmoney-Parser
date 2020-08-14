@@ -26,6 +26,7 @@ class Auxmoney:
     def login(self):
         self.browser.get("https://www.auxmoney.com/login")
         time.sleep(1)
+        self._handle_tracking_note_banner()
 
         iteration = 0
         while self._user_is_not_logged_in():
@@ -40,6 +41,17 @@ class Auxmoney:
                 continue
             if iteration > 2:
                 self._handle_login_unsuccessful()
+
+    def _handle_tracking_note_banner(self):
+        banner_elements = self.browser.find_elements_by_id('uc-main-banner')
+        if len(banner_elements) == 0:
+            return
+        banner = banner_elements[0]
+        if banner is not None:
+            deny_button = self.browser.find_elements_by_id('uc-btn-deny-banner')
+            if deny_button is not None and len(deny_button) > 0:
+                deny_button[0].click()
+                time.sleep(1)
 
     def _user_is_not_logged_in(self):
         return len(self.browser.find_elements_by_xpath(self.LOGIN_BUTTON_SELECTOR)) > 0 \
