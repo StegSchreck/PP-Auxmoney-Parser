@@ -22,6 +22,8 @@ def print_summary(loan_transactions):
     interests = [transaction['value'] for transaction in loan_transactions if transaction['type'] == 'Zinsen']
     fees = [transaction['value'] for transaction in loan_transactions if transaction['type'] == 'Gebühren']
 
+    if len(interests) <= 0 or len(fees) <= 0:
+        return
     avg_interest = sum(interests) / float(len(interests))
     avg_fee = sum(fees) / float(len(fees))
 
