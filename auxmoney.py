@@ -43,15 +43,7 @@ class Auxmoney:
                 self._handle_login_unsuccessful()
 
     def _handle_tracking_note_banner(self):
-        banner_elements = self.browser.find_elements_by_id('uc-main-banner')
-        if len(banner_elements) == 0:
-            return
-        banner = banner_elements[0]
-        if banner is not None:
-            deny_button = self.browser.find_elements_by_id('uc-btn-deny-banner')
-            if deny_button is not None and len(deny_button) > 0:
-                deny_button[0].click()
-                time.sleep(1)
+        pass
 
     def _user_is_not_logged_in(self):
         return len(self.browser.find_elements_by_xpath(self.LOGIN_BUTTON_SELECTOR)) > 0 \
@@ -68,7 +60,8 @@ class Auxmoney:
 
     def _click_login_button(self):
         login_button = self.browser.find_element_by_xpath(self.LOGIN_BUTTON_SELECTOR)
-        login_button.click()
+        self.browser.execute_script("arguments[0].click();", login_button)
+        # login_button.click()
         time.sleep(2)  # wait for page to load
 
     def _handle_login_unsuccessful(self):
