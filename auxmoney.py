@@ -11,10 +11,10 @@ class Auxmoney:
     def __init__(self, args):
         self.args = args
 
-        login_form_selector = "//form[@id='login']"
-        self.LOGIN_USERNAME_SELECTOR = login_form_selector + "//input[@id='login_loginUsername']"
-        self.LOGIN_PASSWORD_SELECTOR = login_form_selector + "//input[@id='login_loginPassword']"
-        self.LOGIN_BUTTON_SELECTOR = login_form_selector + "//input[@type='submit']"
+        login_form_selector = "//form[@id='loginForm']"
+        self.LOGIN_USERNAME_SELECTOR = login_form_selector + "//input[@id='username']"
+        self.LOGIN_PASSWORD_SELECTOR = login_form_selector + "//input[@id='password']"
+        self.LOGIN_BUTTON_SELECTOR = login_form_selector + "//button[@type='submit']"
 
         self._init_browser()
 
@@ -59,10 +59,12 @@ class Auxmoney:
         login_field_password.send_keys(self.args.password)
 
     def _click_login_button(self):
-        login_button = self.browser.find_element_by_xpath(self.LOGIN_BUTTON_SELECTOR)
-        self.browser.execute_script("arguments[0].click();", login_button)
+        # login_button = self.browser.find_element_by_xpath(self.LOGIN_BUTTON_SELECTOR)
+        # self.browser.execute_script("arguments[0].click();", login_button)
         # login_button.click()
-        time.sleep(2)  # wait for page to load
+        login_field_user = self.browser.find_element_by_xpath(self.LOGIN_USERNAME_SELECTOR)
+        login_field_user.submit()
+        time.sleep(5)  # wait for page to load
 
     def _handle_login_unsuccessful(self):
         time.sleep(1)
