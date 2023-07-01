@@ -1,2 +1,2 @@
-selenium
-xvfbwrapper
+selenium==4.8.3
+xvfbwrapper==0.2.9

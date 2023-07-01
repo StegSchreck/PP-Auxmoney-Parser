@@ -3,6 +3,7 @@ import sys
 import time
 
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
 
 from browser_handler import BrowserHandler
 
@@ -46,23 +47,23 @@ class Auxmoney:
         pass
 
     def _user_is_not_logged_in(self):
-        return len(self.browser.find_elements_by_xpath(self.LOGIN_BUTTON_SELECTOR)) > 0 \
-               and len(self.browser.find_elements_by_xpath(self.LOGIN_USERNAME_SELECTOR)) > 0 \
-               and len(self.browser.find_elements_by_xpath(self.LOGIN_PASSWORD_SELECTOR)) > 0
+        return len(self.browser.find_elements(By.XPATH, value=self.LOGIN_BUTTON_SELECTOR)) > 0 \
+               and len(self.browser.find_elements(By.XPATH, value=self.LOGIN_USERNAME_SELECTOR)) > 0 \
+               and len(self.browser.find_elements(By.XPATH, value=self.LOGIN_PASSWORD_SELECTOR)) > 0
 
     def _insert_login_credentials(self):
-        login_field_user = self.browser.find_element_by_xpath(self.LOGIN_USERNAME_SELECTOR)
+        login_field_user = self.browser.find_element(By.XPATH, value=self.LOGIN_USERNAME_SELECTOR)
         login_field_user.clear()
         login_field_user.send_keys(self.args.username)
-        login_field_password = self.browser.find_element_by_xpath(self.LOGIN_PASSWORD_SELECTOR)
+        login_field_password = self.browser.find_element(By.XPATH, value=self.LOGIN_PASSWORD_SELECTOR)
         login_field_password.clear()
         login_field_password.send_keys(self.args.password)
 
     def _click_login_button(self):
-        # login_button = self.browser.find_element_by_xpath(self.LOGIN_BUTTON_SELECTOR)
+        # login_button = self.browser.find_element(By.XPATH, value=self.LOGIN_BUTTON_SELECTOR)
         # self.browser.execute_script("arguments[0].click();", login_button)
         # login_button.click()
-        login_field_user = self.browser.find_element_by_xpath(self.LOGIN_USERNAME_SELECTOR)
+        login_field_user = self.browser.find_element(By.XPATH, value=self.LOGIN_USERNAME_SELECTOR)
         login_field_user.submit()
         time.sleep(5)  # wait for page to load
 
@@ -80,7 +81,7 @@ class Auxmoney:
 
         all_loans_transactions = []
 
-        loan_links = self.browser.find_elements_by_xpath("//table[@class='project-list']//a[@class='details']")
+        loan_links = self.browser.find_elements(By.XPATH, value="//table[@class='project-list']//a[@class='details']")
         loan_details_urls = [loan_link.get_attribute('href') for loan_link in loan_links]
 
         if self.args and self.args.verbose and self.args.verbose >= 1:
@@ -104,9 +105,9 @@ class Auxmoney:
         loan_transactions = []
 
         back_payment_plan_table_rows = \
-            self.browser.find_elements_by_xpath("//div[@class='left-box backPaymentPlan']/table//tr")[1:]
+            self.browser.find_elements(By.XPATH, value="//div[@class='left-box backPaymentPlan']/table//tr")[1:]
         back_payment_table_rows = \
-            self.browser.find_elements_by_xpath("//div[@class='right-box backPayment']/table//tr")[1:]
+            self.browser.find_elements(By.XPATH, value="//div[@class='right-box backPayment']/table//tr")[1:]
 
         if self.args and self.args.verbose and self.args.verbose >= 1:
             sys.stdout.write('      {id}: found {count} transactions (some might be all zero)\r\n'
@@ -114,7 +115,7 @@ class Auxmoney:
             sys.stdout.flush()
 
         for i in range(len(back_payment_table_rows)):
-            transaction_date_text = back_payment_plan_table_rows[i].find_elements_by_tag_name("td")[1].text
+            transaction_date_text = back_payment_plan_table_rows[i].find_elements(by=By.TAG_NAME, value="td")[1].text
             transaction_date = datetime.datetime.strptime(transaction_date_text, '%d.%m.%Y')
 
             if self.args and self.args.earliest:
@@ -139,12 +140,12 @@ class Auxmoney:
         return loan_transactions
 
     def __parse_transaction_interest(self, back_payment_table_row, loan_id, transaction_date_text):
-        transaction_cell = back_payment_table_row.find_elements_by_tag_name("td")[1]
+        transaction_cell = back_payment_table_row.find_elements(by=By.TAG_NAME, value="td")[1]
         transaction_type = 'Zinsen'
         return self.__parse_transaction(loan_id, transaction_cell, transaction_date_text, transaction_type)
 
     def __parse_transaction_fee(self, back_payment_table_row, loan_id, transaction_date_text):
-        transaction_cell = back_payment_table_row.find_elements_by_tag_name("td")[2]
+        transaction_cell = back_payment_table_row.find_elements(by=By.TAG_NAME, value="td")[2]
         transaction_type = 'Gebühren'
         return self.__parse_transaction(loan_id, transaction_cell, transaction_date_text, transaction_type)
 
