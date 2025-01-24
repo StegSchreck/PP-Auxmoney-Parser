@@ -1,2 +1,2 @@
-selenium==4.27.1
+selenium==4.28.1
 xvfbwrapper==0.2.9
